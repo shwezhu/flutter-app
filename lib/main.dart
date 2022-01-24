@@ -1,115 +1,139 @@
 import 'package:flutter/material.dart';
+import 'src/home_page.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
+  // The framework calls createState the first time a widget appears at a given location in the tree.
+  // If the parent rebuilds and uses the same type of widget (with the same key), the framework re-uses
+  // the State object instead of creating a new State object.
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+    return MaterialApp(theme: ThemeData(fontFamily: 'MochiyPopPOne'),
+        debugShowCheckedModeBanner: false, home: const HomePage());
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+/*int _selectedIndex = 0;
+return Scaffold(
+appBar: AppBar(title: const Text('Home page')),
+bottomNavigationBar: BottomNavigationBar(
+items: const <BottomNavigationBarItem>[
+BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+BottomNavigationBarItem(icon: Icon(Icons.monitor), label: 'Monitor'),
+BottomNavigationBarItem(icon: Icon(Icons.science), label: 'Lab')],
+currentIndex: _selectedIndex,
+onTap: _onItemTapped
+)
+);*/
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+/*
+class MyApp extends StatelessWidget {
+  // You can make a variable nullable by putting a question mark (?) at the end of its type.
+  // Widget unique identity — Key
+  const MyApp({Key? key}) : super(key: key);
+  static const String _title = 'Intelligent Agriculture';
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  Widget build(BuildContext context) {
+    // Prefer const with constant constructors.
+    return const MaterialApp(
+      title: _title,
+      home: HomePage(),
+    );
+  }
+}
+*/
+
+/*
+// Create a stateful widget
+class TemperatureInfo extends StatefulWidget {
+  const TemperatureInfo({Key? key}) : super(key: key);
+
+  @override
+  // The framework calls createState the first time a widget appears at a given location in the tree.
+  // If the parent rebuilds and uses the same type of widget (with the same key), the framework re-uses
+  // the State object instead of creating a new State object.
+  // The=>expr syntax is a shorthand for{ return expr; }
+  _TemperatureInfoState createState() => _TemperatureInfoState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+// RandomWords's State class, it maintains the state for the RandomWords widget.
+// The second part “_RandomWordsState” is the part which varies during the lifetime of the Widget
+// and forces this specific instance of the Widget to rebuild each time a modification is applied.
+// The ‘_’ character in the beginning of the name makes the class private to the .dart file.
+// If you need to make a reference to this class outside the .dart file, do not use the ‘_’ prefix.
+// The _RandomWordsState class can access any variable which is stored in the MyStatefulWidget,
+//using widget.{name of the variable}. In this example: widget.color
+class _TemperatureInfoState extends State<TemperatureInfo> {
+  double? _temperature;
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle =
+  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
-  void _incrementCounter() {
+  static const List<Widget> _widgetOptions = <Widget>[
+    Text(
+      'Index 0: Home',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 1: Business',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 2: School',
+      style: optionStyle,
+    ),
+  ];
+
+  void _onItemTapped(int index) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _selectedIndex = index;
     });
   }
 
+  // This method will be called each time your State object changes
+  // (or when an InheritedWidget needs to notify the “registered” widgets) !!
+  // In order to force a rebuild, you may invoke setState((){…}) method.
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    // A widget’s main job is to implement a build()function, which describes the widget in terms of other, lower-level widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Temperature information'),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+        child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      backgroundColor: Colors.blueGrey.shade200,
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.monitor),
+            label: 'Monitor',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.science),
+            label: 'Lab',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
     );
   }
-}
+}*/
