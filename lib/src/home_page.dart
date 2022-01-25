@@ -12,7 +12,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State {
   int _selectedIndex = 0;
 
+  final List<Widget> _pages = <Widget>[const Center(child: Text('1')), const Center(child: Text('2')), const Center(child: Text('3'))];
+
   void _onItemTapped(int index) {
+    // // In order to force a rebuild, you may invoke setState((){…}) method.
     setState(() {
       _selectedIndex = index;
     });
@@ -22,13 +25,14 @@ class _HomePageState extends State {
   // including adding bottom navigation bars, sliding drawers, and tab bars.
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Home page")),
-        body: Center(child: Text('1234$_selectedIndex')),
+    return Scaffold(body: IndexedStack(index: _selectedIndex, children: _pages),
         bottomNavigationBar: BottomNavigationBar(
+            selectedIconTheme: const IconThemeData(color: Colors.blueGrey),
+            unselectedIconTheme: IconThemeData(color: Colors.blueGrey[300], size: 30),
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
               BottomNavigationBarItem(icon: Icon(Icons.monitor), label: 'Monitor'),
-              BottomNavigationBarItem(icon: Icon(Icons.science), label: 'Lab')
+              BottomNavigationBarItem(icon: Icon(Icons.masks), label: 'Covid-19')
             ],
           currentIndex: _selectedIndex,
           onTap: _onItemTapped
