@@ -9,8 +9,6 @@ class GenerateQRPage extends StatefulWidget {
 }
 
 class _GenerateQRPageState extends State<GenerateQRPage> {
-  TextEditingController controller = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,24 +17,7 @@ class _GenerateQRPageState extends State<GenerateQRPage> {
           backgroundColor: Colors.blueGrey,
           elevation: 0
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              QrImage(data: controller.text, size: 300),
-              Container(margin: const EdgeInsets.all(20),
-                  child: TextField(controller: controller,
-                      decoration: const InputDecoration(border: OutlineInputBorder(),
-                          labelText: 'Enter URL'
-                      )
-                  )
-              ),
-              ElevatedButton(onPressed: () {setState(() {});}, child: const Text('GENERATE QR'))
-            ]
-          )
-        )
-      )
+      body: Center(child: QrImage(data: 'https://www.baidu.com/', size: 300))
     );
   }
 }
