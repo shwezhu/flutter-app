@@ -19,7 +19,11 @@ class _MyAppState extends State<MyApp> {
   // This method will be called each time your State object changes.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Intelligent Agriculture', theme: ThemeData(fontFamily: 'MochiyPopPOne'),
-        debugShowCheckedModeBanner: false, home: const HomePage());
+    return MaterialApp(
+        title: 'Intelligent Agriculture',
+        theme: ThemeData(fontFamily: 'MochiyPopPOne'),
+        debugShowCheckedModeBanner: false,
+        home: const HomePage()
+    );
   }
 }
