@@ -10,8 +10,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^0.1.3
   qr_flutter: ^4.0.0
+  # Bmob Flutter SDK
+  data_plugin:
+    git:
+      url: https://github.com/shwezhu/bmob-flutter-sdk
+      path: data_plugin
+  convex_bottom_bar: ^3.0.0
 
 dev_dependencies:
   flutter_test:
