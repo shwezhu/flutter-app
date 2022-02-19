@@ -1,10 +1,16 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:data_plugin/bmob/bmob.dart';
 import 'package:flutter/material.dart';
-import 'config.dart';
+import 'page/covid.dart';
 
-void main() {
-  Bmob.init(Config.appHost, Config.appId, Config.apiKey);
+import 'data/http_utils.dart';
+void main() async {
+  // ?where={\"name\":\"Jack\"}
+  /*final visitors = await getVisitors("https://api.bmob.cn/1/classes/visitors_information");
+  if(visitors == null) {
+    return;
+  }
+  print(visitors[3].name);*/
+
   runApp(const MyApp());
 }
 
@@ -36,7 +42,7 @@ class _HomePage extends State<HomePage> {
   final List<Widget> _uiPages = const [
     Text('1'),
     Text('2'),
-    Text('3')
+    CovidPage()
   ];
 
   void _onTap(int index) {

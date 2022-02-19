@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import '../data/visitor.dart';
 
-class InformationPage extends StatefulWidget {
-  const InformationPage({Key? key}) : super(key: key);
+class AddInformationPage extends StatefulWidget {
+  const AddInformationPage({Key? key}) : super(key: key);
 
   @override
-  _InformationPageState createState() => _InformationPageState();
+  _AddInformationPageState createState() => _AddInformationPageState();
 }
 
-class _InformationPageState extends State<InformationPage> {
+class _AddInformationPageState extends State<AddInformationPage> {
   TextEditingController nameField = TextEditingController();
   TextEditingController phoneField = TextEditingController();
   TextEditingController idField = TextEditingController();
@@ -15,12 +16,17 @@ class _InformationPageState extends State<InformationPage> {
 
   @override
   Widget build(BuildContext context) {
+    const plainTextStyle = TextStyle(
+      fontSize: 12,
+      color: Colors.white,
+    );
+    const clickTextStyle = TextStyle(
+      fontSize: 12,
+      color: Colors.white,
+      fontStyle: FontStyle.italic,
+    );
     return Scaffold(
-        appBar: AppBar(
-            title: const Text('Information Form'),
-            backgroundColor: Colors.blueGrey,
-            elevation: 0
-        ),
+        appBar: AppBar(title: const Text('个人信息填写')),
         body: Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,

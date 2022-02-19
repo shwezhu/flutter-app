@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'pandemic_page.dart';
-import 'information_page.dart';
+import '../page/covid.dart';
+import '../page/add_information.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = <Widget>[const Center(child: Text('1')), const Center(child: InformationPage()), const Center(child: PandemicPage())];
+  final List<Widget> _pages = <Widget>[const Center(child: Text('1')), const Center(child: AddInformationPage()), const Center(child: CovidPage())];
 
   void _onItemTapped(int index) {
     // // In order to force a rebuild, you may invoke setState((){…}) method.
