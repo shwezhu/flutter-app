@@ -14,7 +14,8 @@ class _CovidPageState extends State {
   void _onPressed() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const AddInformationPage()));
+      MaterialPageRoute(builder: (context) => const AddInformationPage())
+    );
   }
 
   @override
@@ -22,12 +23,12 @@ class _CovidPageState extends State {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Visitors Information'),
-        leading: const Icon(Icons.people)
+        leading: const Icon(Icons.people),
       ),
       body: const Text('this is body'),
       floatingActionButton: FloatingActionButton(
         onPressed: _onPressed,
-        child: const Icon(Icons.add)
+        child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat
     );

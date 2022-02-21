@@ -1,8 +1,7 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
-import 'page/covid.dart';
+import 'page/main/covid.dart';
 
-import 'data/http_utils.dart';
 void main() async {
   // ?where={\"name\":\"Jack\"}
   /*final visitors = await getVisitors("https://api.bmob.cn/1/classes/visitors_information");
@@ -10,7 +9,6 @@ void main() async {
     return;
   }
   print(visitors[3].name);*/
-
   runApp(const MyApp());
 }
 

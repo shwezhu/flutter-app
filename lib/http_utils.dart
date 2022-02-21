@@ -2,9 +2,9 @@ import 'dart:convert' as convert;
 import 'dart:core';
 import 'package:http/http.dart' as http;
 import 'package:my_flutter_app/data/visitor.dart';
-import '../config.dart';
+import 'config.dart';
 
-Future<int> addVisitor(String url, Map<String, dynamic> json) async {
+Future<bool> addVisitor(String url, Map<String, dynamic> json) async {
   final response = await http.post(
       Uri.parse(url),
       headers: {
@@ -15,11 +15,7 @@ Future<int> addVisitor(String url, Map<String, dynamic> json) async {
       body: convert.jsonEncode(json)
   );
 
-  if(response.statusCode == 201) {
-    return 1;
-  } else {
-    return 0;
-  }
+  return response.statusCode == 201;
 }
 
 Future<List<Visitor>?> getVisitors(String url) async {
