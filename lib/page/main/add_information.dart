@@ -6,9 +6,16 @@ class AddInformationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+      child: Scaffold(
         appBar: AppBar(title: const Text('信息填写')),
-        body: const InfoForm(),
+        body: const SingleChildScrollView(
+          child: InfoForm(),
+        ),
+      ),
     );
   }
 }

@@ -46,28 +46,28 @@ class InfoFormState extends State<InfoForm> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-              margin: const EdgeInsets.only(top: 20, bottom: 20),
+              margin: const EdgeInsets.only(top: 20, bottom: 25),
               child: InputWidget(
                 controller: nameField,
                 label: "姓名"
               ),
           ),
           Container(
-              margin: const EdgeInsets.only(bottom: 20),
+              margin: const EdgeInsets.only(bottom: 25),
               child: InputWidget(
                   controller: phoneField,
                   label: "手机"
               ),
           ),
           Container(
-              margin: const EdgeInsets.only(bottom: 20),
+              margin: const EdgeInsets.only(bottom: 25),
               child: InputWidget(
                   controller: cityField,
                   label: "最近15天停留的城市"
               ),
           ),
           Container(
-              margin: const EdgeInsets.only(bottom: 10),
+              margin: const EdgeInsets.only(bottom: 25),
               child: InputWidget(
                   controller: idField,
                   label: "身份ID"
