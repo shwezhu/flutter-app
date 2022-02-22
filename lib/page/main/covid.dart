@@ -13,30 +13,43 @@ class CovidPage extends StatefulWidget {
 }
 
 class _CovidPageState extends State {
-  var visitors = <Visitor>[];
-  var visitorWidget = <Widget>[];
+  late List<Visitor> visitors;
+  var visitorWidget = <Widget>[
+    const Card(
+      child: ListTile(
+        title: Text("请尝试下拉刷新"),
+        subtitle: Text("暂无用户数据"),
+      ),
+    ),
+  ];
 
-  void init() async {
-    visitors = await getVisitors();
-    if(visitors.isEmpty) {
-
-    } else {
-      for(int i = 0; i < visitors.length; ++i) {
-        visitorWidget.add(
-            Card(
-              child: ListTile(
-                leading: Text(visitors[i].name),
-                title: Text(visitors[i].city),
-                subtitle: Text(visitors[i].phone),
-              ),
-            ),
-        );
-      }
+  void generateList() {
+    visitorWidget = <Widget>[];
+    for (var visitor in visitors) {
+      visitorWidget.add(
+        Card(
+          child: ListTile(
+            leading: Text(visitor.name),
+            title: Text(visitor.city),
+            subtitle: Text(visitor.phone),
+          ),
+        ),
+      );
     }
   }
 
   Future _refresh() async {
-    return visitors = await getVisitors();
+    var tem = await getVisitors() ?? visitors;
+    if(tem.isEmpty) {
+      return;
+    }
+   // if no setState, RefreshIndicator below won't work
+    setState(() {
+      visitors = tem;
+    });
+    generateList();
+
+    return Future.delayed(const Duration(seconds: 0));
   }
 
   void _onPressed() {
@@ -48,13 +61,18 @@ class _CovidPageState extends State {
 
   @override
   Widget build(BuildContext context) {
-    init();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Visitors Information'),
         leading: const Icon(Icons.people),
       ),
-      body: const Text('this is body'),
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: ListView(
+          padding:  const EdgeInsets.all(8),
+          children: visitorWidget,
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _onPressed,
         child: const Icon(Icons.add),

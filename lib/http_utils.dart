@@ -18,16 +18,16 @@ Future<bool> addVisitor(String url, Map<String, dynamic> json) async {
   return response.statusCode == 201;
 }
 
-Future<List<Visitor>> getVisitors() async {
+Future<List<Visitor>?> getVisitors() async {
   String? responseBody = await get(Config.visitorsTable);
   if(responseBody == null) {
-    return <Visitor>[];
+    return null;
   }
 
   Map<String, dynamic> json = convert.jsonDecode(responseBody);
   final jsonLength = json['results'].length;
   if(jsonLength == 0) {
-    return <Visitor>[];
+    return null;
   }
 
   var visitors = <Visitor>[];
