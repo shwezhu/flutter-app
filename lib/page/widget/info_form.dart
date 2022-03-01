@@ -37,6 +37,27 @@ class InfoFormState extends State<InfoForm> {
     );
   }
 
+  bool _isPhoneNumber(String? value) {
+    String pattern = r'(^(?:[+0]9)?[0-9]{11}$)';
+    RegExp regExp = RegExp(pattern);
+    if(value == null) {
+      return false;
+    }
+    else if (!regExp.hasMatch(value)) {
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
+  bool _isNumeric(String? value) {
+    if(value == null || value.isEmpty) {
+      return false;
+    }
+    return double.tryParse(value) != null;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
@@ -49,14 +70,30 @@ class InfoFormState extends State<InfoForm> {
               margin: const EdgeInsets.only(top: 20, bottom: 25),
               child: InputWidget(
                 controller: nameField,
-                label: "姓名"
+                label: "姓名",
+                validator: (value){
+                  if(_isNumeric(value)) {
+                    return "请输入有效的名字";
+                  }
+                  else {
+                    return null;
+                  }
+                },
               ),
           ),
           Container(
               margin: const EdgeInsets.only(bottom: 25),
               child: InputWidget(
                   controller: phoneField,
-                  label: "手机"
+                  label: "手机",
+                  validator: (value){
+                    if(!_isPhoneNumber(value)) {
+                      return "请输入有效的手机号";
+                    }
+                    else {
+                      return null;
+                    }
+                  },
               ),
           ),
           Container(
@@ -89,7 +126,7 @@ class InfoFormState extends State<InfoForm> {
                     idField.clear();
                   }
                   else {
-                    await warningDialog("⚠", "添加失败, 请重新提交!");
+                    await warningDialog("警告", "添加失败, 请重新提交!");
                   }
                 }
               },
