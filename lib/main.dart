@@ -1,14 +1,9 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'page/main/covid.dart';
+import 'page/main/main.dart';
 
 void main() async {
-  // ?where={\"name\":\"Jack\"}
-  /*final visitors = await getVisitors("https://api.bmob.cn/1/classes/visitors_information");
-  if(visitors == null) {
-    return;
-  }
-  print(visitors[3].name);*/
   runApp(const MyApp());
 }
 
@@ -38,9 +33,9 @@ class _HomePage extends State<HomePage> {
   int _currentIndex = 0;
 
   final List<Widget> _uiPages = const [
-    Text('1'),
-    Text('2'),
-    CovidPage()
+    MainPage(),
+    MainPage(),
+    CovidPage(),
   ];
 
   void _onTap(int index) {

@@ -68,6 +68,7 @@ class _CovidPageState extends State {
       ),
       body: RefreshIndicator(
         onRefresh: _refresh,
+        // By design, RefreshIndicator only works with ListView.
         child: ListView(
           padding:  const EdgeInsets.all(8),
           children: visitorWidget,

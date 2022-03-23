@@ -18,11 +18,13 @@ dependencies:
       url: https://github.com/shwezhu/bmob-flutter-sdk
       path: data_plugin
   convex_bottom_bar: ^3.0.0
+  fl_chart: ^0.46.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^1.0.0
+
 
 flutter:
   uses-material-design: true
