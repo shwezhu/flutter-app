@@ -6,7 +6,7 @@ import '../../http_utils.dart';
 
 class Wrapper {
   Widget chart = const Text("请尝试下拉刷新, 暂无数据");
-  List<FlSpot> spots = const [];
+  List<FlSpot> spots = [];
   double minX = 0;
   double maxX = 0;
   double minY = 100;
@@ -117,15 +117,13 @@ class _MainPageState extends State {
     );
   }
 
-  Future<int> _temRefreshData(Wrapper wrapper) async{
-    final data = await getTemperature();
+  Future<int> _refreshData(Wrapper wrapper, Function() getData) async{
+    final data = await getData();
     if(data == null) {
       return -1;
     }
 
-    wrapper.spots = data
-        .map((elementOfData) => FlSpot(elementOfData.date.millisecondsSinceEpoch.toDouble(), elementOfData.value))
-        .toList();
+    data.map((e) {wrapper.spots.add(FlSpot(e.date.millisecondsSinceEpoch.toDouble(), e.value));}).toList();
 
     wrapper.minX = wrapper.spots.first.x;
     wrapper.maxX = wrapper.spots.last.x;
@@ -144,40 +142,8 @@ class _MainPageState extends State {
     return 0;
   }
 
-  Future<int> _humRefreshData(Wrapper wrapper) async{
-    final data = await getHumidity();
-    if(data == null) {
-      return -1;
-    }
-
-    wrapper.spots = data
-        .map((elementOfData) => FlSpot(elementOfData.date.millisecondsSinceEpoch.toDouble(), elementOfData.value))
-        .toList();
-
-    wrapper.minX = wrapper.spots.first.x;
-    wrapper.maxX = wrapper.spots.last.x;
-    wrapper.bottomTitlesInterval = (wrapper.maxX - wrapper.minX)/8;
-    wrapper.spots.map((elementOfData) => {
-      wrapper.minY = wrapper.minY > elementOfData.y ? elementOfData.y : wrapper.minY,
-      wrapper.maxY = wrapper.maxY < elementOfData.y ? elementOfData.y : wrapper.maxY,
-    }).toList();
-
-    wrapper.minY = wrapper.minY.floorToDouble();
-    wrapper.maxY = wrapper.maxY.ceilToDouble();
-    wrapper.leftTitlesInterval = (wrapper.maxY - wrapper.minY)/6;
-
-    wrapper.currentValue = wrapper.spots.last.y;
-
-    return 0;
-  }
-
-  Future<Widget?> _refreshChart(Wrapper wrapper, bool isTemperature) async{
-    var res = -1;
-    if (isTemperature) {
-      res = await _temRefreshData(wrapper);
-    } else {
-      res = await _humRefreshData(wrapper);
-    }
+  Future<Widget?> _refreshChart(Wrapper wrapper, Function() getData) async{
+    var res = await _refreshData(wrapper, getData);
 
     if(res == -1) {
       return null;
@@ -193,8 +159,8 @@ class _MainPageState extends State {
   }
 
   Future _onRefresh() async {
-    final tem = await _refreshChart(_temChartParameter, true) ?? _temChartParameter.chart;
-    final hum = await _refreshChart(_humChartParameter, false) ?? _humChartParameter.chart;
+    final tem = await _refreshChart(_temChartParameter, getTemperature) ?? _temChartParameter.chart;
+    final hum = await _refreshChart(_humChartParameter, getHumidity) ?? _humChartParameter.chart;
 
     // If no setState, RefreshIndicator won't work.
     setState(() {
