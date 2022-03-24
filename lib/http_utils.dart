@@ -45,7 +45,8 @@ Future<List<Temperature>?> getTemperature(String sql) async{
   String? body;
   try {
     // Use that IP address instead of localhost, because you are using emulator.
-    body = await http.get(Uri.parse('http://192.168.1.110:8080'), headers: {'sql': sql}).then((http.Response response) {
+    // 'http://192.168.1.110:8080'
+    body = await http.get(Uri.parse('http://172.20.10.5:8080'), headers: {'sql': sql}).then((http.Response response) {
       final int statusCode = response.statusCode;
       if (statusCode != 200) {
         // Print(jsonDecode(response.body)["message"]);

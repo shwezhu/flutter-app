@@ -21,6 +21,7 @@ class _MainPageState extends State {
   double _maxY = 0;
   double _leftTitlesInterval = 0;
   double _bottomTitlesInterval = 0;
+  double _currentTemperature = 0;
 
   SideTitles _bottomTitles() {
     return SideTitles(
@@ -33,6 +34,9 @@ class _MainPageState extends State {
         fontSize: 8,
       ),
       getTitles: (value) {
+        if(value == _maxX) {
+          return '';
+        }
         final dateFormat = DateFormat('HH:mm');
         return dateFormat.format(DateTime.fromMillisecondsSinceEpoch(value.toInt()));
       },
@@ -42,14 +46,19 @@ class _MainPageState extends State {
   SideTitles _leftTitles() {
     return SideTitles(
       showTitles: true,
-      margin: 5,
+      margin: 6,
       interval: _leftTitlesInterval,
       getTextStyles: (context, value) => const TextStyle(
         color: Color(0xff67727d),
         fontWeight: FontWeight.bold,
-        fontSize: 8,
+        fontSize: 7,
       ),
-      getTitles: (value) => value.floorToDouble().toString(),
+      getTitles: (value) {
+        if(value == _minY || value == _maxY) {
+          return '';
+        }
+        return value.toInt().toString() + '°C';
+      },
     );
   }
 
@@ -65,7 +74,7 @@ class _MainPageState extends State {
 
     _minX = tempSpots.first.x;
     _maxX = tempSpots.last.x;
-    _bottomTitlesInterval = (_maxX - _minX)/4;
+    _bottomTitlesInterval = (_maxX - _minX)/8;
     data.map((element) => {
       _minY = _minY > element.value ? element.value : _minY,
       _maxY = _maxY < element.value ? element.value : _maxY
@@ -73,7 +82,9 @@ class _MainPageState extends State {
 
     _minY = _minY.floorToDouble();
     _maxY = _maxY.ceilToDouble();
-    _leftTitlesInterval = ((_maxY - _minY)/4);
+    _leftTitlesInterval = ((_maxY - _minY)/6);
+
+    _currentTemperature = data.last.value;
 
     return 0;
   }
@@ -81,12 +92,13 @@ class _MainPageState extends State {
 
   LineChartData mainData() {
     return LineChartData(
+      // appearance of X, Y axis
       borderData: FlBorderData(
         show: true,
         border: const Border(
-          left: BorderSide(color: Colors.black),
+          left: BorderSide(color: Color(0xff4e4965), width: 1),
           top: BorderSide(color: Colors.transparent),
-          bottom: BorderSide(color: Colors.black),
+          bottom: BorderSide(color: Color(0xff4e4965), width: 1),
           right: BorderSide(color: Colors.transparent),
         ),
       ),
@@ -119,6 +131,7 @@ class _MainPageState extends State {
           // show shadow below line
           belowBarData: BarAreaData(
             show: true,
+            colors: const [Color(0x33aa4cfc)],
           ),
         ),
       ],
@@ -132,7 +145,7 @@ class _MainPageState extends State {
     }
 
     return Container(
-      padding: const EdgeInsets.only(top: 45, bottom: 10, left: 5, right: 16),
+      padding: const EdgeInsets.only(top: 5, bottom: 10, left: 5, right: 16),
       width: double.infinity,
       child: LineChart(
         mainData(),
@@ -164,6 +177,10 @@ class _MainPageState extends State {
         child: ListView(
             padding: const EdgeInsets.all(0),
             children: [
+              Container(
+                padding: const EdgeInsets.only(left: 6, top: 8),
+                child: Text("当前温度: $_currentTemperature ℃"),
+              ),
               // if don't use SizedBox: RenderLineChart object was given an infinite size during layout.
               // https://stackoverflow.com/questions/60058946/flutter-object-was-given-an-infinite-size-during-layout
               SizedBox(
