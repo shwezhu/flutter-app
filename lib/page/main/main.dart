@@ -3,6 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../http_utils.dart';
 
+
+class Wrapper {
+  Widget chart = const Text("请尝试下拉刷新, 暂无数据");
+  List<FlSpot> spots = const [];
+  double minX = 0;
+  double maxX = 0;
+  double minY = 100;
+  double maxY = 0;
+  double leftTitlesInterval = 0;
+  double bottomTitlesInterval = 0;
+  double currentValue = 0;
+}
+
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}): super(key: key);
 
@@ -13,38 +26,21 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State {
-  late Widget _temChart = const Text("请尝试下拉刷新, 暂无数据");
-  List<FlSpot> _temSpots = const [];
-  double _temMinX = 0;
-  double _temMaxX = 0;
-  double _temMinY = 30;
-  double _temMaxY = 0;
-  double _temLeftTitlesInterval = 0;
-  double _temBottomTitlesInterval = 0;
-  double _currentTemperature = 0;
+  final Wrapper _temChartParameter = Wrapper();
+  final Wrapper _humChartParameter = Wrapper();
 
-  late Widget _humChart = const Text("请尝试下拉刷新, 暂无数据");
-  List<FlSpot> _humSpots = const [];
-  double _humMinX = 0;
-  double _humMaxX = 0;
-  double _humMinY = 30;
-  double _humMaxY = 0;
-  double _humLeftTitlesInterval = 0;
-  double _humBottomTitlesInterval = 0;
-  double _currentHumidity = 0;
-
-  SideTitles _temBottomTitles() {
+  SideTitles _getBottomTitles(Wrapper wrapper) {
     return SideTitles(
       showTitles: true,
       margin: 5,
-      interval: _temBottomTitlesInterval,
+      interval: wrapper.bottomTitlesInterval,
       getTextStyles: (context, value) => const TextStyle(
         color: Color(0xff67727d),
         fontWeight: FontWeight.bold,
         fontSize: 8,
       ),
       getTitles: (value) {
-        if(value == _temMaxX) {
+        if(value == wrapper.maxX) {
           return '';
         }
         final dateFormat = DateFormat('HH:mm');
@@ -53,18 +49,18 @@ class _MainPageState extends State {
     );
   }
 
-  SideTitles _temLeftTitles() {
+  SideTitles _getLeftTitles(Wrapper wrapper) {
     return SideTitles(
       showTitles: true,
       margin: 6,
-      interval: _temLeftTitlesInterval,
+      interval: wrapper.leftTitlesInterval,
       getTextStyles: (context, value) => const TextStyle(
         color: Color(0xff67727d),
         fontWeight: FontWeight.bold,
         fontSize: 7,
       ),
       getTitles: (value) {
-        if(value == _temMinY || value == _temMaxY) {
+        if(value == wrapper.minY || value == wrapper.maxY) {
           return '';
         }
         return value.toInt().toString() + '°C';
@@ -72,7 +68,7 @@ class _MainPageState extends State {
     );
   }
 
-  LineChartData _temGenerateChartData() {
+  LineChartData _generateChartData(Wrapper wrapper) {
     return LineChartData(
       // appearance of X, Y axis
       borderData: FlBorderData(
@@ -93,16 +89,16 @@ class _MainPageState extends State {
         // titles of left, top, right and bottom axis
         rightTitles: SideTitles(showTitles: false),
         topTitles: SideTitles(showTitles: false),
-        bottomTitles: _temBottomTitles(),
-        leftTitles: _temLeftTitles(),
+        bottomTitles: _getBottomTitles(wrapper),
+        leftTitles: _getLeftTitles(wrapper),
       ),
-      minX: _temMinX,
-      maxX: _temMaxX,
-      minY: _temMinY,
-      maxY: _temMaxY,
+      minX: wrapper.minX,
+      maxX: wrapper.maxX,
+      minY: wrapper.minY,
+      maxY: wrapper.maxY,
       lineBarsData: [
         LineChartBarData(
-          spots: _temSpots,
+          spots: wrapper.spots,
           isCurved: true,
           barWidth: 3,
 
@@ -121,35 +117,68 @@ class _MainPageState extends State {
     );
   }
 
-  Future<int> _temRefreshData() async{
+  Future<int> _temRefreshData(Wrapper wrapper) async{
     final data = await getTemperature();
     if(data == null) {
       return -1;
     }
 
-    _temSpots = data
+    wrapper.spots = data
         .map((elementOfData) => FlSpot(elementOfData.date.millisecondsSinceEpoch.toDouble(), elementOfData.value))
         .toList();
 
-    _temMinX = _temSpots.first.x;
-    _temMaxX = _temSpots.last.x;
-    _temBottomTitlesInterval = (_temMaxX - _temMinX)/8;
-    data.map((elementOfData) => {
-      _temMinY = _temMinY > elementOfData.value ? elementOfData.value : _temMinY,
-      _temMaxY = _temMaxY < elementOfData.value ? elementOfData.value : _temMaxY
+    wrapper.minX = wrapper.spots.first.x;
+    wrapper.maxX = wrapper.spots.last.x;
+    wrapper.bottomTitlesInterval = (wrapper.maxX - wrapper.minX)/8;
+    wrapper.spots.map((elementOfData) => {
+      wrapper.minY = wrapper.minY > elementOfData.y ? elementOfData.y : wrapper.minY,
+      wrapper.maxY = wrapper.maxY < elementOfData.y ? elementOfData.y : wrapper.maxY,
     }).toList();
 
-    _temMinY = _temMinY.floorToDouble();
-    _temMaxY = _temMaxY.ceilToDouble();
-    _temLeftTitlesInterval = (_temMaxY - _temMinY)/6;
+    wrapper.minY = wrapper.minY.floorToDouble();
+    wrapper.maxY = wrapper.maxY.ceilToDouble();
+    wrapper.leftTitlesInterval = (wrapper.maxY - wrapper.minY)/6;
 
-    _currentTemperature = data.last.value;
+    wrapper.currentValue = wrapper.spots.last.y;
 
     return 0;
   }
 
-  Future<Widget?> _temRefreshChart() async{
-    final res = await _temRefreshData();
+  Future<int> _humRefreshData(Wrapper wrapper) async{
+    final data = await getHumidity();
+    if(data == null) {
+      return -1;
+    }
+
+    wrapper.spots = data
+        .map((elementOfData) => FlSpot(elementOfData.date.millisecondsSinceEpoch.toDouble(), elementOfData.value))
+        .toList();
+
+    wrapper.minX = wrapper.spots.first.x;
+    wrapper.maxX = wrapper.spots.last.x;
+    wrapper.bottomTitlesInterval = (wrapper.maxX - wrapper.minX)/8;
+    wrapper.spots.map((elementOfData) => {
+      wrapper.minY = wrapper.minY > elementOfData.y ? elementOfData.y : wrapper.minY,
+      wrapper.maxY = wrapper.maxY < elementOfData.y ? elementOfData.y : wrapper.maxY,
+    }).toList();
+
+    wrapper.minY = wrapper.minY.floorToDouble();
+    wrapper.maxY = wrapper.maxY.ceilToDouble();
+    wrapper.leftTitlesInterval = (wrapper.maxY - wrapper.minY)/6;
+
+    wrapper.currentValue = wrapper.spots.last.y;
+
+    return 0;
+  }
+
+  Future<Widget?> _refreshChart(Wrapper wrapper, bool isTemperature) async{
+    var res = -1;
+    if (isTemperature) {
+      res = await _temRefreshData(wrapper);
+    } else {
+      res = await _humRefreshData(wrapper);
+    }
+
     if(res == -1) {
       return null;
     }
@@ -158,17 +187,19 @@ class _MainPageState extends State {
       padding: const EdgeInsets.only(top: 5, bottom: 10, left: 5, right: 16),
       width: double.infinity,
       child: LineChart(
-        _temGenerateChartData(),
+        _generateChartData(wrapper),
       ),
     );
   }
 
-  Future _temOnRefresh() async {
-    var tem = await _temRefreshChart() ?? _temChart;
+  Future _onRefresh() async {
+    final tem = await _refreshChart(_temChartParameter, true) ?? _temChartParameter.chart;
+    final hum = await _refreshChart(_humChartParameter, false) ?? _humChartParameter.chart;
 
-    // if no setState, RefreshIndicator below won't work
+    // If no setState, RefreshIndicator won't work.
     setState(() {
-      _temChart = tem;
+      _temChartParameter.chart = tem;
+      _humChartParameter.chart = hum;
     });
 
     return Future.delayed(const Duration(seconds: 0));
@@ -187,17 +218,25 @@ class _MainPageState extends State {
       // https://stackoverflow.com/questions/60058946/flutter-object-was-given-an-infinite-size-during-layout
       // By design, RefreshIndicator only works with ListView.
       body: RefreshIndicator(
-        onRefresh: _temOnRefresh,
+        onRefresh: _onRefresh,
         child: ListView(
             padding: const EdgeInsets.all(0),
             children: [
               Container(
                 padding: const EdgeInsets.only(left: 6, top: 8),
-                child: Text("当前温度: $_currentTemperature ℃"),
+                child: Text("当前温度: ${_temChartParameter.currentValue} ℃"),
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.width * 0.5,
-                child: _temChart,
+                height: MediaQuery.of(context).size.height * 0.35,
+                child: _temChartParameter.chart,
+              ),
+              Container(
+                padding: const EdgeInsets.only(left: 6, top: 8),
+                child: Text("当前湿度: ${_humChartParameter.currentValue} H"),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.35,
+                child: _humChartParameter.chart,
               ),
             ]
         ),

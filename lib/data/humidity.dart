@@ -5,6 +5,6 @@ class Humidity {
   DateTime date;
 
   factory Humidity.fromJson(Map<String, dynamic> json) {
-    return Humidity(json['Humidity'], DateTime.parse(json['date']));
+    return Humidity(json['humidity'], DateTime.parse(json['date']));
   }
 }

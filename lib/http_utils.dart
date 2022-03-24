@@ -16,7 +16,7 @@ Future<String?> get(String url, {Map<String, String>? headers}) async{
   http.Response response;
   try {
     response = await http.get(Uri.parse(url), headers: headers)
-        .timeout(const Duration(seconds: 6), onTimeout: () {return http.Response('Error', 408);});
+        .timeout(const Duration(seconds: 3), onTimeout: () {return http.Response('Error', 408);});
   } catch(e) {
     if(e is SocketException){
       // print("Socket exception: ${e.toString()}");
@@ -37,7 +37,7 @@ Future<String?> get(String url, {Map<String, String>? headers}) async{
 
 Future<List<Temperature>?> getTemperature() async{
   String? body = await get(
-      'http://172.20.10.5:8080',
+      'http://192.168.1.101:8080',
       headers: {'sql': 'select * from (select * from temperature order by id desc limit 20) aa order BY id'},
   );
   if(body == null) {
@@ -60,7 +60,7 @@ Future<List<Temperature>?> getTemperature() async{
 
 Future<List<Humidity>?> getHumidity() async{
   String? body = await get(
-      'http://192.168.1.110:8080',
+      'http://192.168.1.101:8080',
       headers: {'sql': 'select * from (select * from humidity order by id desc limit 20) aa order BY id'},
   );
   if(body == null) {

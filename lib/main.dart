@@ -61,9 +61,10 @@ class _HomePage extends State<HomePage> {
             TabItem(icon: Icons.monitor, title: '监控'),
             TabItem(icon: Icons.masks, title: 'Covid-19')
           ],
+            top: 0,
             height: 50,
             initialActiveIndex: 0,
-            style: TabStyle.titled,
+            style: TabStyle.reactCircle,
             onTap: _onTap
         )
       )
