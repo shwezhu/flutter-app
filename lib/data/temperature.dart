@@ -5,6 +5,6 @@ class Temperature {
   DateTime date;
 
   factory Temperature.fromJson(Map<String, dynamic> json) {
-    return Temperature(json["temperature"], DateTime.parse(json['date']));
+    return Temperature(json['temperature'], DateTime.parse(json['date']));
   }
 }

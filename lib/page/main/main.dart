@@ -63,7 +63,7 @@ class _MainPageState extends State {
   }
 
   Future<int> _generateTempSpot() async{
-    final data = await getTemperature('select * from (select * from temperature order by id desc limit 20) aa order BY id');
+    final data = await getTemperature();
     if(data == null) {
       return -1;
     }

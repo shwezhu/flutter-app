@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert' as convert;
 import 'dart:core';
 import 'dart:io';
@@ -6,6 +5,131 @@ import 'package:http/http.dart' as http;
 import 'package:my_flutter_app/data/visitor.dart';
 import 'config.dart';
 import 'package:my_flutter_app/data/temperature.dart';
+import 'package:my_flutter_app/data/humidity.dart';
+
+
+// When status code = 200 return response.body.
+// Otherwise return null.
+// Use that IP address instead of localhost, because you are using emulator.
+// 'http://192.168.1.110:8080' instead of '192.168.1.110:8080'.
+Future<String?> get(String url, {Map<String, String>? headers}) async{
+  http.Response response;
+  try {
+    response = await http.get(Uri.parse(url), headers: headers)
+        .timeout(const Duration(seconds: 6), onTimeout: () {return http.Response('Error', 408);});
+  } catch(e) {
+    if(e is SocketException){
+      // print("Socket exception: ${e.toString()}");
+      return null;
+    }
+    else {
+      // print("Unhandled exception: ${e.toString()}");
+      return null;
+    }
+  }
+
+  if (response.statusCode != 200) {
+    return null;
+  }
+
+  return response.body;
+}
+
+Future<List<Temperature>?> getTemperature() async{
+  String? body = await get(
+      'http://172.20.10.5:8080',
+      headers: {'sql': 'select * from (select * from temperature order by id desc limit 20) aa order BY id'},
+  );
+  if(body == null) {
+    return null;
+  }
+
+  Map<String, dynamic>? json = convertBodyToJson(body);
+  if(json == null) {
+    return null;
+  }
+
+  var data = <Temperature>[];
+  final length = json['results'].length;
+  for(int index = 0; index < length; ++index) {
+    data.add(Temperature.fromJson(json['results'][index]));
+  }
+
+  return data;
+}
+
+Future<List<Humidity>?> getHumidity() async{
+  String? body = await get(
+      'http://192.168.1.110:8080',
+      headers: {'sql': 'select * from (select * from humidity order by id desc limit 20) aa order BY id'},
+  );
+  if(body == null) {
+    return null;
+  }
+
+  Map<String, dynamic>? json = convertBodyToJson(body);
+  if(json == null) {
+    return null;
+  }
+
+  var data = <Humidity>[];
+  final length = json['results'].length;
+  for(int index = 0; index < length; ++index) {
+    data.add(Humidity.fromJson(json['results'][index]));
+  }
+
+  return data;
+}
+
+Future<List<Visitor>?> getVisitors() async {
+  String? body = await get(
+    Config.visitorsTable,
+    headers: {
+      "X-Bmob-Application-Id": Config.appId,
+      "X-Bmob-REST-API-Key": Config.apiKey
+    },
+  );
+  if(body == null) {
+    return null;
+  }
+
+  Map<String, dynamic>? json = convertBodyToJson(body);
+  if(json == null) {
+    return null;
+  }
+
+  var data = <Visitor>[];
+  final jsonLength = json['results'].length;
+  for(int index = 0; index < jsonLength; ++index) {
+    data.add(Visitor.fromJson(json['results'][index]));
+  }
+
+  return data;
+}
+
+Map<String, dynamic>? convertBodyToJson(String rawJson) {
+  Map<String, dynamic> json;
+  try{
+    json = convert.jsonDecode(rawJson);
+  } on FormatException{
+    return null;
+  }
+
+  var length = 0;
+  try{
+    // json['results'] == null when json doesn't have key 'results'.
+    // null doesn't has method: length().
+    length = json['results'].length;
+  } on NoSuchMethodError{
+    return null;
+  }
+
+  if(length == 0) {
+    return null;
+  }
+
+  return json;
+}
 
 Future<bool> addVisitor(String url, Map<String, dynamic> json) async {
   final response = await http.post(
@@ -15,100 +139,8 @@ Future<bool> addVisitor(String url, Map<String, dynamic> json) async {
         "X-Bmob-REST-API-Key": Config.apiKey,
         'Content-type': 'application/json; charset=UTF-8'
       },
-      body: convert.jsonEncode(json)
+      body: convert.jsonEncode(json),
   );
 
   return response.statusCode == 201;
-}
-
-Future<List<Visitor>?> getVisitors() async {
-  String? responseBody = await get(Config.visitorsTable);
-  if(responseBody == null) {
-    return null;
-  }
-
-  Map<String, dynamic> json = convert.jsonDecode(responseBody);
-  final jsonLength = json['results'].length;
-  if(jsonLength == 0) {
-    return null;
-  }
-
-  var visitors = <Visitor>[];
-  for(int index = 0; index < jsonLength; ++index) {
-    visitors.add(Visitor.fromJson(json['results'][index]));
-  }
-
-  return visitors;
-}
-
-Future<List<Temperature>?> getTemperature(String sql) async{
-  http.Response response;
-  String body;
-  try {
-    // Use that IP address instead of localhost, because you are using emulator.
-    // 'http://192.168.1.110:8080'
-    response = await http.get(Uri.parse('http://172.20.10.5:8080'), headers: {'sql': sql})
-    .timeout(
-        const Duration(seconds: 6),
-        onTimeout: () {
-          return http.Response('Error', 408);
-        });
-  } catch(e) {
-    if(e is SocketException){
-      // print("Socket exception: ${e.toString()}");
-      return null;
-    }
-    else if(e is TimeoutException){
-      // print("Timeout exception: ${e.toString()}");
-      return null;
-    }
-    else {
-      // print("Unhandled exception: ${e.toString()}");
-      return null;
-    }
-  }
-
-  final int statusCode = response.statusCode;
-  if (statusCode != 200) {
-    // Print(jsonDecode(response.body)["message"]);
-    return null;
-  }
-
-  body = response.body;
-  Map<String, dynamic> json = convert.jsonDecode(body);
-  var length = 0;
-  try{
-    // in case of json['results'] == null
-    length = json['results'].length;
-  }
-  on NoSuchMethodError{
-    return null;
-  }
-
-  if(length == 0) {
-    return null;
-  }
-
-  var data = <Temperature>[];
-  for(int index = 0; index < length; ++index) {
-    data.add(Temperature.fromJson(json['results'][index]));
-  }
-
-  return data;
-}
-
-Future<String?> get(String url) {
-  // Pass headers below
-  return http.get(
-      Uri.parse(url),
-      headers: {
-        "X-Bmob-Application-Id": Config.appId,
-        "X-Bmob-REST-API-Key": Config.apiKey}).then((http.Response response) {
-    final int statusCode = response.statusCode;
-    if (statusCode < 200 || statusCode >= 400) {
-      // Print(jsonDecode(response.body)["message"]);
-      return null;
-    }
-    return response.body;
-  });
 }
