@@ -81,6 +81,9 @@ Future<List<Humidity>?> getHumidity() async{
   return data;
 }
 
+// Config is a user custom class that has three static String variable
+// appId, apiKey and Config.visitorsTable.
+// Config.visitorsTable = "https://api.bmob.cn/1/classes/visitors_information"
 Future<List<Visitor>?> getVisitors() async {
   String? body = await get(
     Config.visitorsTable,
