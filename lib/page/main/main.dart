@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../http_utils.dart';
 
 class MainPage extends StatefulWidget {
@@ -13,46 +14,134 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State {
   late Widget temperatureChart = const Text("请尝试下拉刷新, 暂无数据");
-  Future<List<FlSpot>?> generateTempSpot() async{
-    final data = await getTemperature('select * from temperature limit 0,48');
-    if(data == null) {
-      return null;
-    }
+  List<FlSpot> tempSpots = const [];
+  double _minX = 0;
+  double _maxX = 0;
+  double _minY = 30;
+  double _maxY = 0;
+  double _leftTitlesInterval = 0;
+  double _bottomTitlesInterval = 0;
 
-    final List<FlSpot> spots = data
-        .map((temperature) => FlSpot(temperature.date.hour + temperature.date.minute/100, temperature.value))
-        .toList();
-
-    return spots;
+  SideTitles _bottomTitles() {
+    return SideTitles(
+      showTitles: true,
+      margin: 5,
+      interval: _bottomTitlesInterval,
+      getTextStyles: (context, value) => const TextStyle(
+        color: Color(0xff67727d),
+        fontWeight: FontWeight.bold,
+        fontSize: 8,
+      ),
+      getTitles: (value) {
+        final dateFormat = DateFormat('HH:mm');
+        return dateFormat.format(DateTime.fromMillisecondsSinceEpoch(value.toInt()));
+      },
+    );
   }
 
-  Future<Widget?> generateTempChart() async{
-    var tempSpots = await generateTempSpot();
-    if(tempSpots == null) {
+  SideTitles _leftTitles() {
+    return SideTitles(
+      showTitles: true,
+      margin: 5,
+      interval: _leftTitlesInterval,
+      getTextStyles: (context, value) => const TextStyle(
+        color: Color(0xff67727d),
+        fontWeight: FontWeight.bold,
+        fontSize: 8,
+      ),
+      getTitles: (value) => value.floorToDouble().toString(),
+    );
+  }
+
+  Future<int> _generateTempSpot() async{
+    final data = await getTemperature('select * from (select * from temperature order by id desc limit 20) aa order BY id');
+    if(data == null) {
+      return -1;
+    }
+
+    tempSpots = data
+        .map((temperature) => FlSpot(temperature.date.millisecondsSinceEpoch.toDouble(), temperature.value))
+        .toList();
+
+    _minX = tempSpots.first.x;
+    _maxX = tempSpots.last.x;
+    _bottomTitlesInterval = (_maxX - _minX)/4;
+    data.map((element) => {
+      _minY = _minY > element.value ? element.value : _minY,
+      _maxY = _maxY < element.value ? element.value : _maxY
+    }).toList();
+
+    _minY = _minY.floorToDouble();
+    _maxY = _maxY.ceilToDouble();
+    _leftTitlesInterval = ((_maxY - _minY)/4);
+
+    return 0;
+  }
+
+
+  LineChartData mainData() {
+    return LineChartData(
+      borderData: FlBorderData(
+        show: true,
+        border: const Border(
+          left: BorderSide(color: Colors.black),
+          top: BorderSide(color: Colors.transparent),
+          bottom: BorderSide(color: Colors.black),
+          right: BorderSide(color: Colors.transparent),
+        ),
+      ),
+      gridData: FlGridData(
+        show: true,
+      ),
+      titlesData: FlTitlesData(
+        show: true,
+        // left top right and bottom axis
+        rightTitles: SideTitles(showTitles: false),
+        topTitles: SideTitles(showTitles: false),
+        bottomTitles: _bottomTitles(),
+        leftTitles: _leftTitles(),
+      ),
+      minX: _minX,
+      maxX: _maxX,
+      minY: _minY,
+      maxY: _maxY,
+      lineBarsData: [
+        LineChartBarData(
+          spots: tempSpots,
+          isCurved: true,
+          barWidth: 3,
+
+          // show dot of the spot
+          dotData: FlDotData(
+            show: false,
+          ),
+
+          // show shadow below line
+          belowBarData: BarAreaData(
+            show: true,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<Widget?> _generateTempChart() async{
+    final res = await _generateTempSpot();
+    if(res == -1) {
       return null;
     }
 
     return Container(
-      padding: const EdgeInsets.all(0),
+      padding: const EdgeInsets.only(top: 45, bottom: 10, left: 5, right: 16),
       width: double.infinity,
       child: LineChart(
-        LineChartData(
-          borderData: FlBorderData(show: false),
-          lineBarsData: [
-            // The red line
-            LineChartBarData(
-              spots: tempSpots,
-              isCurved: true,
-              barWidth: 3,
-            ),
-          ],
-        ),
+        mainData(),
       ),
     );
   }
 
   Future _refresh() async {
-    var tem = await generateTempChart() ?? temperatureChart;
+    var tem = await _generateTempChart() ?? temperatureChart;
 
     // if no setState, RefreshIndicator below won't work
     setState(() {
@@ -73,7 +162,7 @@ class _MainPageState extends State {
       body: RefreshIndicator(
         onRefresh: _refresh,
         child: ListView(
-            padding: const EdgeInsets.only(top: 45, bottom: 10),
+            padding: const EdgeInsets.all(0),
             children: [
               // if don't use SizedBox: RenderLineChart object was given an infinite size during layout.
               // https://stackoverflow.com/questions/60058946/flutter-object-was-given-an-infinite-size-during-layout

@@ -18,7 +18,10 @@ dependencies:
       url: https://github.com/shwezhu/bmob-flutter-sdk
       path: data_plugin
   convex_bottom_bar: ^3.0.0
+  # for line chart
   fl_chart: ^0.46.0
+  # for DateFormat
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
