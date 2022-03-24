@@ -13,28 +13,38 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State {
-  late Widget temperatureChart = const Text("请尝试下拉刷新, 暂无数据");
-  List<FlSpot> tempSpots = const [];
-  double _minX = 0;
-  double _maxX = 0;
-  double _minY = 30;
-  double _maxY = 0;
-  double _leftTitlesInterval = 0;
-  double _bottomTitlesInterval = 0;
+  late Widget _temChart = const Text("请尝试下拉刷新, 暂无数据");
+  List<FlSpot> _temSpots = const [];
+  double _temMinX = 0;
+  double _temMaxX = 0;
+  double _temMinY = 30;
+  double _temMaxY = 0;
+  double _temLeftTitlesInterval = 0;
+  double _temBottomTitlesInterval = 0;
   double _currentTemperature = 0;
 
-  SideTitles _bottomTitles() {
+  late Widget _humChart = const Text("请尝试下拉刷新, 暂无数据");
+  List<FlSpot> _humSpots = const [];
+  double _humMinX = 0;
+  double _humMaxX = 0;
+  double _humMinY = 30;
+  double _humMaxY = 0;
+  double _humLeftTitlesInterval = 0;
+  double _humBottomTitlesInterval = 0;
+  double _currentHumidity = 0;
+
+  SideTitles _temBottomTitles() {
     return SideTitles(
       showTitles: true,
       margin: 5,
-      interval: _bottomTitlesInterval,
+      interval: _temBottomTitlesInterval,
       getTextStyles: (context, value) => const TextStyle(
         color: Color(0xff67727d),
         fontWeight: FontWeight.bold,
         fontSize: 8,
       ),
       getTitles: (value) {
-        if(value == _maxX) {
+        if(value == _temMaxX) {
           return '';
         }
         final dateFormat = DateFormat('HH:mm');
@@ -43,18 +53,18 @@ class _MainPageState extends State {
     );
   }
 
-  SideTitles _leftTitles() {
+  SideTitles _temLeftTitles() {
     return SideTitles(
       showTitles: true,
       margin: 6,
-      interval: _leftTitlesInterval,
+      interval: _temLeftTitlesInterval,
       getTextStyles: (context, value) => const TextStyle(
         color: Color(0xff67727d),
         fontWeight: FontWeight.bold,
         fontSize: 7,
       ),
       getTitles: (value) {
-        if(value == _minY || value == _maxY) {
+        if(value == _temMinY || value == _temMaxY) {
           return '';
         }
         return value.toInt().toString() + '°C';
@@ -62,35 +72,7 @@ class _MainPageState extends State {
     );
   }
 
-  Future<int> _generateTempSpot() async{
-    final data = await getTemperature();
-    if(data == null) {
-      return -1;
-    }
-
-    tempSpots = data
-        .map((temperature) => FlSpot(temperature.date.millisecondsSinceEpoch.toDouble(), temperature.value))
-        .toList();
-
-    _minX = tempSpots.first.x;
-    _maxX = tempSpots.last.x;
-    _bottomTitlesInterval = (_maxX - _minX)/8;
-    data.map((element) => {
-      _minY = _minY > element.value ? element.value : _minY,
-      _maxY = _maxY < element.value ? element.value : _maxY
-    }).toList();
-
-    _minY = _minY.floorToDouble();
-    _maxY = _maxY.ceilToDouble();
-    _leftTitlesInterval = ((_maxY - _minY)/6);
-
-    _currentTemperature = data.last.value;
-
-    return 0;
-  }
-
-
-  LineChartData mainData() {
+  LineChartData _temGenerateChartData() {
     return LineChartData(
       // appearance of X, Y axis
       borderData: FlBorderData(
@@ -102,24 +84,25 @@ class _MainPageState extends State {
           right: BorderSide(color: Colors.transparent),
         ),
       ),
+      // background line
       gridData: FlGridData(
         show: true,
       ),
       titlesData: FlTitlesData(
         show: true,
-        // left top right and bottom axis
+        // titles of left, top, right and bottom axis
         rightTitles: SideTitles(showTitles: false),
         topTitles: SideTitles(showTitles: false),
-        bottomTitles: _bottomTitles(),
-        leftTitles: _leftTitles(),
+        bottomTitles: _temBottomTitles(),
+        leftTitles: _temLeftTitles(),
       ),
-      minX: _minX,
-      maxX: _maxX,
-      minY: _minY,
-      maxY: _maxY,
+      minX: _temMinX,
+      maxX: _temMaxX,
+      minY: _temMinY,
+      maxY: _temMaxY,
       lineBarsData: [
         LineChartBarData(
-          spots: tempSpots,
+          spots: _temSpots,
           isCurved: true,
           barWidth: 3,
 
@@ -138,8 +121,35 @@ class _MainPageState extends State {
     );
   }
 
-  Future<Widget?> _generateTempChart() async{
-    final res = await _generateTempSpot();
+  Future<int> _temRefreshData() async{
+    final data = await getTemperature();
+    if(data == null) {
+      return -1;
+    }
+
+    _temSpots = data
+        .map((elementOfData) => FlSpot(elementOfData.date.millisecondsSinceEpoch.toDouble(), elementOfData.value))
+        .toList();
+
+    _temMinX = _temSpots.first.x;
+    _temMaxX = _temSpots.last.x;
+    _temBottomTitlesInterval = (_temMaxX - _temMinX)/8;
+    data.map((elementOfData) => {
+      _temMinY = _temMinY > elementOfData.value ? elementOfData.value : _temMinY,
+      _temMaxY = _temMaxY < elementOfData.value ? elementOfData.value : _temMaxY
+    }).toList();
+
+    _temMinY = _temMinY.floorToDouble();
+    _temMaxY = _temMaxY.ceilToDouble();
+    _temLeftTitlesInterval = (_temMaxY - _temMinY)/6;
+
+    _currentTemperature = data.last.value;
+
+    return 0;
+  }
+
+  Future<Widget?> _temRefreshChart() async{
+    final res = await _temRefreshData();
     if(res == -1) {
       return null;
     }
@@ -148,17 +158,17 @@ class _MainPageState extends State {
       padding: const EdgeInsets.only(top: 5, bottom: 10, left: 5, right: 16),
       width: double.infinity,
       child: LineChart(
-        mainData(),
+        _temGenerateChartData(),
       ),
     );
   }
 
-  Future _refresh() async {
-    var tem = await _generateTempChart() ?? temperatureChart;
+  Future _temOnRefresh() async {
+    var tem = await _temRefreshChart() ?? _temChart;
 
     // if no setState, RefreshIndicator below won't work
     setState(() {
-      temperatureChart = tem;
+      _temChart = tem;
     });
 
     return Future.delayed(const Duration(seconds: 0));
@@ -171,9 +181,13 @@ class _MainPageState extends State {
         title: const Text('温室大棚环境信息'),
         leading: const Icon(Icons.wb_sunny_outlined),
       ),
+      /// Core code blew, two line char: _temChart and _humChart
+      // Must use SizedBox to wrap these two line chart _temChart and _humChart.
+      // if don't use SizedBox: RenderLineChart object was given an infinite size during layout.
+      // https://stackoverflow.com/questions/60058946/flutter-object-was-given-an-infinite-size-during-layout
       // By design, RefreshIndicator only works with ListView.
       body: RefreshIndicator(
-        onRefresh: _refresh,
+        onRefresh: _temOnRefresh,
         child: ListView(
             padding: const EdgeInsets.all(0),
             children: [
@@ -181,11 +195,9 @@ class _MainPageState extends State {
                 padding: const EdgeInsets.only(left: 6, top: 8),
                 child: Text("当前温度: $_currentTemperature ℃"),
               ),
-              // if don't use SizedBox: RenderLineChart object was given an infinite size during layout.
-              // https://stackoverflow.com/questions/60058946/flutter-object-was-given-an-infinite-size-during-layout
               SizedBox(
                 height: MediaQuery.of(context).size.width * 0.5,
-                child: temperatureChart,
+                child: _temChart,
               ),
             ]
         ),
