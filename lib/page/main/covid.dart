@@ -13,7 +13,7 @@ class CovidPage extends StatefulWidget {
 }
 
 class _CovidPageState extends State {
-  late List<Visitor> visitors;
+  List<Visitor> visitors = [];
   var visitorWidget = <Widget>[
     const Card(
       child: ListTile(
