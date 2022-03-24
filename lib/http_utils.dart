@@ -42,18 +42,17 @@ Future<List<Visitor>?> getVisitors() async {
 }
 
 Future<List<Temperature>?> getTemperature(String sql) async{
-  String? body;
+  http.Response response;
+  String body;
   try {
     // Use that IP address instead of localhost, because you are using emulator.
     // 'http://192.168.1.110:8080'
-    body = await http.get(Uri.parse('http://172.20.10.5:8080'), headers: {'sql': sql}).then((http.Response response) {
-      final int statusCode = response.statusCode;
-      if (statusCode != 200) {
-        // Print(jsonDecode(response.body)["message"]);
-        return null;
-      }
-      return response.body;
-    });
+    response = await http.get(Uri.parse('http://172.20.10.5:8080'), headers: {'sql': sql})
+    .timeout(
+        const Duration(seconds: 6),
+        onTimeout: () {
+          return http.Response('Error', 408);
+        });
   } catch(e) {
     if(e is SocketException){
       // print("Socket exception: ${e.toString()}");
@@ -69,10 +68,13 @@ Future<List<Temperature>?> getTemperature(String sql) async{
     }
   }
 
-  if(body == null) {
+  final int statusCode = response.statusCode;
+  if (statusCode != 200) {
+    // Print(jsonDecode(response.body)["message"]);
     return null;
   }
 
+  body = response.body;
   Map<String, dynamic> json = convert.jsonDecode(body);
   var length = 0;
   try{
