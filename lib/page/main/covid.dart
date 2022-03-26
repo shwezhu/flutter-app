@@ -14,7 +14,7 @@ class CovidPage extends StatefulWidget {
 
 class _CovidPageState extends State {
   List<Visitor> visitors = [];
-  var visitorWidget = <Widget>[
+  var visitorWidgets = <Widget>[
     const Card(
       child: ListTile(
         title: Text("请尝试下拉刷新"),
@@ -24,9 +24,9 @@ class _CovidPageState extends State {
   ];
 
   void generateList() {
-    visitorWidget = <Widget>[];
+    visitorWidgets = <Widget>[];
     for (var visitor in visitors) {
-      visitorWidget.add(
+      visitorWidgets.add(
         Card(
           child: ListTile(
             leading: Text(visitor.name),
@@ -71,7 +71,7 @@ class _CovidPageState extends State {
         // By design, RefreshIndicator only works with ListView.
         child: ListView(
           padding:  const EdgeInsets.all(8),
-          children: visitorWidget,
+          children: visitorWidgets,
         ),
       ),
       floatingActionButton: FloatingActionButton(

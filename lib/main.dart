@@ -1,5 +1,6 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:my_flutter_app/page/main/monitor.dart';
 import 'page/main/covid.dart';
 import 'page/main/main.dart';
 
@@ -34,7 +35,7 @@ class _HomePage extends State<HomePage> {
 
   final List<Widget> _uiPages = const [
     MainPage(),
-    MainPage(),
+    MonitorPage(),
     CovidPage(),
   ];
 
