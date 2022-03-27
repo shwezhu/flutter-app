@@ -50,7 +50,6 @@ class _HomePage extends State<HomePage> {
     return MaterialApp(
       title: '智慧农业',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(fontFamily: 'MochiyPopPOne'),
       home: Scaffold(
         body: IndexedStack(
           children: _uiPages,

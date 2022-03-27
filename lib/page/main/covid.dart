@@ -63,7 +63,7 @@ class _CovidPageState extends State {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Visitors Information'),
+        title: const Text('来访顾客信息'),
         leading: const Icon(Icons.people),
       ),
       body: RefreshIndicator(

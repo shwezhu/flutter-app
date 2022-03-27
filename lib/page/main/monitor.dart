@@ -3,7 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
-import 'package:mqtt_client/mqtt_browser_client.dart';
+import 'package:mqtt_client/mqtt_server_client.dart';
 
 
 class MyImage {
@@ -23,8 +23,9 @@ class MonitorPage extends StatefulWidget {
 }
 
 class _MonitorPageState extends State {
+  bool isConnected = false;
   String topic = 'greenhouse/alarm';
-  final client = MqttBrowserClient('localhost', 'my_flutter_app_1');
+  final client = MqttServerClient('192.168.1.109', 'my_flutter_app');
   List<MyImage> images = [];
   var imageWidgets = <Widget>[
     const Text("暂无不明入侵者"),
@@ -35,16 +36,19 @@ class _MonitorPageState extends State {
   initState() {
     super.initState();
     // Set the protocol to V3.1.1 for iot-core,
-    // if you fail to do this you will receive a connect ack with the response code
-    // 0x01 Connection Refused, unacceptable protocol version
     client.setProtocolV311();
     // logging if you wish
-    client.logging(on: false);
+    client.logging(on: true);
     // If you intend to use a keep alive you must set it here otherwise keep alive will be disabled.
-    client.keepAlivePeriod = 20;
+    client.keepAlivePeriod = 30;
   }
 
   void _connectMqtt() async{
+    // avoid reconnect
+    if (isConnected == true) {
+      return;
+    }
+
     // Connect the client, any errors here are communicated by raising of the appropriate exception.
     try {
       await client.connect();
@@ -59,6 +63,7 @@ class _MonitorPageState extends State {
       return;
     }
     if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      isConnected = true;
       showAlertDialog(context, '通知', '连接成功');
     }
 
@@ -75,11 +80,28 @@ class _MonitorPageState extends State {
     ///!!!try... on FormatException catch (e)
     decodedBytes = base64Decode(message);
     // add an image bytes information to list
-    images.add(MyImage(decodedBytes, getCurrentTime()));
+    images.add(MyImage(decodedBytes, _getCurrentTime()));
     _updateImageWidgets();
     /// So if the state of the widget changes you have to call setState to trigger a rebuild of the view and
     /// see immediately the changes implied by the new state.
     setState(() {});
+  }
+
+  void _updateImageWidgets() {
+    imageWidgets = <Widget>[];
+    images.map((image) {
+      imageWidgets.add(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(image.info),
+              const SizedBox(height: 5),
+              Image.memory(image.bytes),
+              const SizedBox(height: 15),
+            ],
+          )
+      );
+    }).toList();
   }
 
   void showAlertDialog(BuildContext context, String title, String message) {
@@ -109,21 +131,7 @@ class _MonitorPageState extends State {
     );
   }
 
-  void _updateImageWidgets() {
-    imageWidgets = <Widget>[];
-    images.map((image) {
-      imageWidgets.add(
-          Column(
-            children: [
-              Text(image.info),
-              Image.memory(image.bytes),
-            ],
-          )
-      );
-    }).toList();
-  }
-
-  String getCurrentTime() {
+  String _getCurrentTime() {
     DateTime now = DateTime.now();
     return now.hour.toString() + ':' + now.minute.toString() + ' '
         + now.day.toString() + '/' + now.month.toString() + '/'
@@ -137,8 +145,9 @@ class _MonitorPageState extends State {
         title: const Text('监控图像'),
         leading: const Icon(Icons.monitor),
       ),
+      backgroundColor: const Color.fromARGB(220, 117, 218 ,255),
       body: ListView(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(15),
         children: imageWidgets,
       ),
       floatingActionButton: FloatingActionButton(
