@@ -37,7 +37,7 @@ Future<String?> get(String url, {Map<String, String>? headers}) async{
 
 Future<List<Temperature>?> getTemperature() async{
   String? body = await get(
-      'http://192.168.1.101:8080',
+      'http://192.168.1.109:8080',
       headers: {'sql': 'select * from (select * from temperature order by id desc limit 20) aa order BY id'},
   );
   if(body == null) {
@@ -60,7 +60,7 @@ Future<List<Temperature>?> getTemperature() async{
 
 Future<List<Humidity>?> getHumidity() async{
   String? body = await get(
-      'http://192.168.1.101:8080',
+      'http://192.168.1.109:8080',
       headers: {'sql': 'select * from (select * from humidity order by id desc limit 20) aa order BY id'},
   );
   if(body == null) {

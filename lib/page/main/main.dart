@@ -122,7 +122,8 @@ class _MainPageState extends State {
     if(data == null) {
       return -1;
     }
-
+    // you have to do this, make spots = []
+    wrapper.spots = [];
     data.map((e) {wrapper.spots.add(FlSpot(e.date.millisecondsSinceEpoch.toDouble(), e.value));}).toList();
 
     wrapper.minX = wrapper.spots.first.x;
