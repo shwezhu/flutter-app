@@ -1,10 +1,14 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/page/main/monitor.dart';
-import 'page/main/covid.dart';
-import 'page/main/main.dart';
+import 'package:my_flutter_app/page/main/covid.dart';
+import 'package:my_flutter_app/page/main/main.dart';
+import 'package:my_flutter_app/service/notification_service.dart';
 
-void main() async {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  NotificationService notificationService = NotificationService();
+  await notificationService.init();
   runApp(const MyApp());
 }
 

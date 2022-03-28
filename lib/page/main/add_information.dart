@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widget/info_form.dart';
+import 'package:my_flutter_app/page/widget/info_form.dart';
 
 class AddInformationPage extends StatelessWidget {
   const AddInformationPage({Key? key}) : super(key: key);

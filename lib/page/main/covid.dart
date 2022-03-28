@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../data/visitor.dart';
-import 'add_information.dart';
-import '../../http_utils.dart';
+import 'package:my_flutter_app/data/visitor.dart';
+import 'package:my_flutter_app/page/main/add_information.dart';
+import 'package:my_flutter_app/http_utils.dart';
 
 class CovidPage extends StatefulWidget {
   const CovidPage({Key? key}) : super(key: key);

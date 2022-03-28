@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'input_widget.dart';
-import '../../data/visitor.dart';
-import '../../http_utils.dart';
-import '../../config.dart';
+import 'package:my_flutter_app/page/widget/input_widget.dart';
+import 'package:my_flutter_app/data/visitor.dart';
+import 'package:my_flutter_app/http_utils.dart';
+import 'package:my_flutter_app/config.dart';
 
 class InfoForm extends StatefulWidget {
   const InfoForm({Key? key}) : super(key: key);

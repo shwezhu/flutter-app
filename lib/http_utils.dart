@@ -3,10 +3,9 @@ import 'dart:core';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:my_flutter_app/data/visitor.dart';
-import 'config.dart';
+import 'package:my_flutter_app/config.dart';
 import 'package:my_flutter_app/data/temperature.dart';
 import 'package:my_flutter_app/data/humidity.dart';
-
 
 // When status code = 200 return response.body.
 // Otherwise return null.

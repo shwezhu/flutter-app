@@ -24,6 +24,8 @@ dependencies:
   intl: ^0.17.0
   # mqtt client
   mqtt_client: ^9.6.5
+  # notifications
+  flutter_local_notifications: ^9.1.2
 
 dev_dependencies:
   flutter_test:

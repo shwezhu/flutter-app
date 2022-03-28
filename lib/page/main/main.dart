@@ -1,8 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../http_utils.dart';
-
+import 'package:my_flutter_app/http_utils.dart';
 
 class Wrapper {
   Widget chart = const Text("请尝试下拉刷新, 暂无数据");
