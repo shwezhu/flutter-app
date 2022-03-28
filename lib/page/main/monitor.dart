@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
+import 'package:my_flutter_app/service/notification_service.dart';
 
 class MyImage {
   Uint8List bytes;
@@ -22,6 +23,9 @@ class MonitorPage extends StatefulWidget {
 }
 
 class _MonitorPageState extends State {
+  // For notification.
+  NotificationService notificationService = NotificationService();
+
   bool isConnected = false;
   String topic = 'greenhouse/alarm';
   final client = MqttServerClient('192.168.1.109', 'my_flutter_app');
@@ -72,7 +76,7 @@ class _MonitorPageState extends State {
   }
 
   // a callback function for mqtt message
-  void _onMessage(List<MqttReceivedMessage> event) {
+  Future<void> _onMessage(List<MqttReceivedMessage> event) async{
     final recMess = event[0].payload as MqttPublishMessage;
     final message = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
     Uint8List decodedBytes;
@@ -84,6 +88,13 @@ class _MonitorPageState extends State {
     /// So if the state of the widget changes you have to call setState to trigger a rebuild of the view and
     /// see immediately the changes implied by the new state.
     setState(() {});
+
+    // Push notification to user.
+    await notificationService.showNotification(
+      0,
+      '通知',
+      "发现有物体入侵大棚",
+    );
   }
 
   void _updateImageWidgets() {

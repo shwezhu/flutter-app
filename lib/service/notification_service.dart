@@ -41,7 +41,7 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
-  Future<void> showNotification(int id, String title, String body, String payload) async {
-    await flutterLocalNotificationsPlugin.show(id, title, body, notificationDetails, payload: payload,);
+  Future<void> showNotification(int id, String title, String body) async {
+    await flutterLocalNotificationsPlugin.show(id, title, body, notificationDetails);
   }
 }
