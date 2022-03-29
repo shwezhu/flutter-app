@@ -65,7 +65,7 @@ class _MonitorPageState extends State {
       showAlertDialog(context, '警告', e.toString());
       return;
     }
-    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+    if(client.connectionStatus!.state == MqttConnectionState.connected) {
       isConnected = true;
       showAlertDialog(context, '通知', '连接成功');
     }
